@@ -1342,7 +1342,7 @@ class CNTextInput extends Component {
           ref={component => this.textInput = component}
           onChangeText={this.handleChangeText}
           onKeyPress={this.handleKeyDown}
-          selection={selection}
+          // selection={selection}
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onContentSizeChange={this.handleContentSizeChange}

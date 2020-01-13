@@ -598,8 +598,7 @@ class CNRichTextEditor extends Component {
                     }
               {
                     // Invisible Input to measure scroll in Ios
-                    measureInputScroll
-                    && (
+                    IS_IOS && measureInputScroll && (
                     <View
                       onLayout={this.onMeasureLayout}
                       pointerEvents="none"

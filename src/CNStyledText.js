@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, Platform } from 'react-native';
 import _ from 'lodash';
+
+const isAndroid = Platform.OS === 'android';
 
 class CNStyledText extends Component {
   constructor(props) {
@@ -20,12 +22,30 @@ class CNStyledText extends Component {
     return true;
   }
 
-  render() {
+  renderBaseText = (text = this.props.text) => (
+    <Text style={this.props.style}>
+      {text}
+    </Text>
+  );
+
+  renderMultilineAndroidText = (text = this.props.text) => {
+    if (!text || text === '\n') {
+      return this.renderBaseText();
+    }
+
+    const multilineTextItems = text.split('\n');
+
     return (
-      <Text style={this.props.style}>
-        {this.props.text}
-      </Text>
+      <React.Fragment>
+        {multilineTextItems.map(text => (this.renderBaseText(text || '\n')))}
+      </React.Fragment>
     );
+  };
+
+  render() {
+    return isAndroid
+      ? this.renderMultilineAndroidText()
+      : this.renderBaseText();
   }
 }
 
