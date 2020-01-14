@@ -77,6 +77,11 @@ class CNTextInput extends Component {
     }
   }
 
+  forceUpdateWitheCalculate = () => {
+    this.reCalculateTextOnUpate = true;
+    this.forceUpdate();
+  };
+
   findContentIndex(content, cursorPosition) {
     let indx = 0;
     let findIndx = -1;

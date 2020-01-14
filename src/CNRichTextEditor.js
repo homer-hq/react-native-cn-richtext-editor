@@ -51,6 +51,10 @@ class CNRichTextEditor extends Component {
       }
     }
 
+    forceUpdateFocusedInput = () => {
+      this.textInputs[this.state.focusInputIndex].forceUpdateWitheCalculate();
+    };
+
     findContentIndex(content, cursorPosition) {
       let indx = 0;
       let findIndx = -1;
