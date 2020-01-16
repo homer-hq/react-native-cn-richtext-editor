@@ -29,6 +29,7 @@ export function convertToHtmlString(contents, styleList = null) {
         const isOverline = item.stype.indexOf('lineThrough') > -1;
         const isBlue = item.stype.indexOf('blue') > -1;
         const isRed = item.stype.indexOf('red') > -1;
+        const isOrange = item.stype.indexOf('orange') > -1;
         const isGreen = item.stype.indexOf('green') > -1;
         const isBlueMarker = item.stype.indexOf('blue_hl') > -1;
         const isGreenMarker = item.stype.indexOf('green_hl') > -1;
@@ -67,6 +68,7 @@ export function convertToHtmlString(contents, styleList = null) {
         styles += isUnderLine ? 'text-decoration: underline;' : '';
         styles += isBlue ? `color: ${availableStyles.blue.color};` : '';
         styles += isRed ? `color: ${availableStyles.red.color};` : '';
+        styles += isOrange ? `color: ${availableStyles.orange.color};` : '';
         styles += isGreen ? `color: ${availableStyles.green.color};` : '';
         styles += isBlueMarker ? `background-color: ${availableStyles.blue_hl.backgroundColor};` : '';
         styles += isGreenMarker ? `background-color: ${availableStyles.green_hl.backgroundColor};` : '';
@@ -283,6 +285,7 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
   let isGreen = false;
   let isBlue = false;
   let isRed = false;
+  let isOrange = false;
 
   let isBlueMarker = false;
   let isOrangeMarker = false;
@@ -301,6 +304,7 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
       isUnderLine = styles.indexOf('text-decoration: underline;') > -1;
       isBlue = styles.indexOf(`color: ${availableStyles.blue.color};`) > -1;
       isRed = styles.indexOf(`color: ${availableStyles.red.color};`) > -1;
+      isOrange = styles.indexOf(`color: ${availableStyles.orange.color};`) > -1;
       isGreen = styles.indexOf(`color: ${availableStyles.green.color};`) > -1;
       isBlueMarker = styles.indexOf(`background-color: ${availableStyles.blue_hl.backgroundColor};`) > -1;
       isGreenMarker = styles.indexOf(`background-color: ${availableStyles.green_hl.backgroundColor};`) > -1;
@@ -344,6 +348,9 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
   }
   if (isRed) {
     stype.push('red');
+  }
+  if (isOrange) {
+    stype.push('orange');
   }
 
   if (isBlueMarker) {
@@ -449,13 +456,16 @@ const defaultStyles = StyleSheet.create(
       fontSize: 20,
     },
     red: {
-      color: '#d23431',
+      color: '#D52842',
     },
     green: {
-      color: '#4a924d',
+      color: '#00BE7C',
     },
     blue: {
-      color: '#0560ab',
+      color: '#007AFF',
+    },
+    orange: {
+      color: '#F5A623',
     },
     black: {
       color: '#33363d',
