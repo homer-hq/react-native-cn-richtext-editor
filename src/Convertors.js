@@ -474,13 +474,13 @@ const defaultStyles = StyleSheet.create(
       backgroundColor: '#34f3f4',
     },
     green_hl: {
-      backgroundColor: '#2df149',
+      backgroundColor: '#00FFA7',
     },
     pink_hl: {
-      backgroundColor: '#f53ba7',
+      backgroundColor: '#FFA394',
     },
     yellow_hl: {
-      backgroundColor: '#f6e408',
+      backgroundColor: '#F5D523',
     },
     orange_hl: {
       backgroundColor: '#f07725',
