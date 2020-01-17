@@ -9,21 +9,16 @@ class CNStyledText extends Component {
     super(props);
   }
 
-
   shouldComponentUpdate(nextProps) {
-    if (_.isEqual(this.props.text, nextProps.text)
-            && _.isEqual(this.props.style, nextProps.style)
-
-    ) {
+    if (_.isEqual(this.props.text, nextProps.text) && _.isEqual(this.props.style, nextProps.style)) {
       return false;
     }
-
 
     return true;
   }
 
-  renderBaseText = (text = this.props.text) => (
-    <Text style={this.props.style}>
+  renderBaseText = (text = this.props.text, key = undefined) => (
+    <Text style={this.props.style} key={key}>
       {text}
     </Text>
   );
@@ -37,7 +32,7 @@ class CNStyledText extends Component {
 
     return (
       <React.Fragment>
-        {multilineTextItems.map(text => (this.renderBaseText(text || '\n')))}
+        {multilineTextItems.map((text, i) => (this.renderBaseText(text || '\n', `key-${i}-${text}`)))}
       </React.Fragment>
     );
   };
