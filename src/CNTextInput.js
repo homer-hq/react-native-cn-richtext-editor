@@ -1319,12 +1319,9 @@ class CNTextInput extends Component {
     }
 
     render() {
-      const {
-        items, foreColor, style, returnKeyType, styleList, textInputProps
-      } = this.props;
+      const { items, style, returnKeyType, styleList, textInputProps } = this.props;
       const { selection } = this.state;
-      const color = foreColor || '#000';
-      const fontSize =styleList && styleList.body && styleList.body.fontSize ? styleList.body.fontSize : 20;
+      const fontDefaultStyle = (styleList && styleList.body) || {};
       
       return (
         <TextInput
@@ -1332,15 +1329,7 @@ class CNTextInput extends Component {
           underlineColorAndroid="rgba(0,0,0,0)"
           onSelectionChange={this.onSelectionChange}
           multiline
-          style={[{
-            color,
-            fontSize: fontSize,
-            paddingTop: 5,
-            paddingBottom: 5,
-            paddingLeft: 2,
-            paddingRight: 2,
-            textAlignVertical: 'top',
-          }, style || {}]}
+          style={[fontDefaultStyle, style]}
           scrollEnabled={false}
           returnKeyType={returnKeyType || 'next'}
           keyboardType="default"

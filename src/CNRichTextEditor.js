@@ -428,11 +428,10 @@ class CNRichTextEditor extends Component {
             onFocus={(e) => this.handleOnFocus(e, index)}
             onBlur={(e)=> this.handleOnBlur(e, index)}
             returnKeyType={this.props.returnKeyType}
-            foreColor={this.props.foreColor}
             styleList={styles}
             placeholder={index === 0 ? this.props.placeholder : undefined}
             textInputProps={this.props.textInputProps}
-            style={[{ flexGrow: 1 }, this.props.textInputStyle]}
+            style={this.props.textInputStyle}
             onKeyPressHandler={this.props.onKeyPressHandler}
           />
         </View>
