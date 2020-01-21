@@ -461,14 +461,10 @@ class CNRichTextEditor extends Component {
         <View
           key={`image${index}`}
           style={{
-
             flexDirection: 'row',
-            alignItems: 'flex-start',
+            alignItems: 'center',
+            justifyContent: 'center',
             backgroundColor: this.state.imageHighLightedInex === index ? 'yellow' : 'transparent',
-            paddingLeft: 2,
-            paddingRight: 2,
-            paddingTop: 2,
-            paddingBottom: 2,
           }}
         >
           <TouchableWithoutFeedback
