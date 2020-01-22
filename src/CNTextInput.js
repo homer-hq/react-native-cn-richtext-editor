@@ -1126,11 +1126,11 @@ class CNTextInput extends Component {
             if (content[i].readOnly === true) {
               this.textLength -= content[i].len;
               if (i === 0) {
-                content[i].text = '\u2022 ';
-                content[i].len = 2;
+                content[i].text = '\u2022';
+                content[i].len = 1;
               } else {
-                content[i].text = '\n\u2022 ';
-                content[i].len = 3;
+                content[i].text = '\n\u2022';
+                content[i].len = 2;
               }
               this.textLength += content[i].len;
 
@@ -1144,25 +1144,25 @@ class CNTextInput extends Component {
                 content[i].NewLine = false;
                 const listContent = {
                   id: shortid.generate(),
-                  len: i === 0 ? 2 : 3,
+                  len: i === 0 ? 1 : 2,
                   stype: [],
                   styleList: clearStyleList,
-                  text: i === 0 ? '\u2022 ' : '\n\u2022 ',
+                  text: i === 0 ? '\u2022' : '\n\u2022',
                   tag: 'ul',
                   NewLine: true,
                   readOnly: true,
                 };
                 content = update(content, { $splice: [[i, 0, listContent]] });
               } else {
-                content[i].text = i === 0 ? '\u2022 ' : '\n\u2022 ';
-                content[i].len = i === 0 ? 2 : 3;
+                content[i].text = i === 0 ? '\u2022' : '\n\u2022';
+                content[i].len = i === 0 ? 1 : 2;
                 content[i].readOnly = true;
                 content[i].stype = [];
                 content[i].styleList = clearStyleList;
               }
-              this.textLength += 2;
+              this.textLength += 1;
               if (fromTextChange === true && IS_IOS !== true) {
-                this.androidSelectionJump += 2;
+                this.androidSelectionJump += 1;
               }
 
               // }

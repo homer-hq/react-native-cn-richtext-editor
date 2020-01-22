@@ -17,11 +17,15 @@ class CNStyledText extends Component {
     return true;
   }
 
-  renderBaseText = (text = this.props.text, key = undefined) => (
-    <Text style={this.props.style} key={key}>
-      {text}
-    </Text>
-  );
+  renderBaseText = (text = this.props.text, key = undefined) => {
+    const isBullet = text === '\u2022' || text === '\n\u2022';
+
+    return (
+      <Text style={[this.props.style, isBullet && { letterSpacing: 6 }]} key={key}>
+        {text}
+      </Text>
+    );
+  }
 
   renderMultilineAndroidText = (text = this.props.text) => {
     if (!text || text === '\n') {
