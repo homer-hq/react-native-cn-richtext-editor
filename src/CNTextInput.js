@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, StyleSheet, Platform } from 'react-native';
+import { TextInput, StyleSheet, Platform, Text } from 'react-native';
 import _ from 'lodash';
 import update from 'immutability-helper';
 import DiffMatchPatch from 'diff-match-patch';
@@ -1322,38 +1322,53 @@ class CNTextInput extends Component {
       const { items, style, returnKeyType, styleList, textInputProps } = this.props;
       const { selection } = this.state;
       const fontDefaultStyle = (styleList && styleList.body) || {};
+      // fixes for android font family
+      const isEmptyInput = items.length ===1 && !items[0].text;
+      const androidEmptyFont = IS_IOS ? null : { fontFamily: undefined };
+      const androidFullFont = IS_IOS ? null : { fontFamily: fontDefaultStyle.fontFamily };
       
       return (
-        <TextInput
-          {...textInputProps}
-          underlineColorAndroid="rgba(0,0,0,0)"
-          onSelectionChange={this.onSelectionChange}
-          multiline
-          style={[fontDefaultStyle, style]}
-          scrollEnabled={false}
-          returnKeyType={returnKeyType || 'next'}
-          keyboardType="default"
-          ref={component => this.textInput = component}
-          onChangeText={this.handleChangeText}
-          onKeyPress={this.handleKeyDown}
-          // selection={selection}
-          onFocus={this.onFocus}
-          onBlur={this.onBlur}
-          onContentSizeChange={this.handleContentSizeChange}
-          placeholder={this.props.placeholder}
-        >
-          {_.map(items, item => {
-            let customStyles = item.stype.map(key => styleList[key] || null).filter(item => !!item);
+        <React.Fragment>
+          <TextInput
+            {...textInputProps}
+            underlineColorAndroid="rgba(0,0,0,0)"
+            onSelectionChange={this.onSelectionChange}
+            multiline
+            style={[fontDefaultStyle, androidEmptyFont, style]}
+            scrollEnabled={false}
+            returnKeyType={returnKeyType || 'next'}
+            keyboardType="default"
+            ref={component => this.textInput = component}
+            onChangeText={this.handleChangeText}
+            onKeyPress={this.handleKeyDown}
+            // selection={selection}
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
+            onContentSizeChange={this.handleContentSizeChange}
+            placeholder={IS_IOS ? this.props.placeholder : undefined}
+          >
+            {_.map(items, item => {
+              let customStyles = item.stype.map(key => styleList[key] || null).filter(item => !!item);
 
-            if (item.stype.includes('bold') && item.stype.includes('italic') && styleList.boldItalic) {
-              customStyles = { ...customStyles, ...styleList.boldItalic };
-            }
+              if (item.stype.includes('bold') && item.stype.includes('italic') && styleList.boldItalic) {
+                customStyles = { ...customStyles, ...styleList.boldItalic };
+              }
 
-            return(
-              <CNStyledText key={item.id} style={[item.styleList, customStyles]} text={item.text} />
-            );
-          })}
-        </TextInput>
+              return(
+                <CNStyledText key={item.id} style={[androidFullFont, item.styleList, customStyles]} text={item.text} />
+              );
+            })}
+          </TextInput>
+          {!IS_IOS && isEmptyInput && (
+            <Text style={[
+              fontDefaultStyle,
+              style,
+              { position: 'absolute', top: 2, color: textInputProps.placeholderTextColor },
+            ]}>
+              {this.props.placeholder}
+            </Text>
+          )}
+        </React.Fragment>
       );
     }
 
