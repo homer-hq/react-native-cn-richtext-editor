@@ -271,7 +271,7 @@ class CNRichTextEditor extends Component {
       newConents = update(newConents, { $splice: [[index, 0, item]] });
 
       if (newConents.length === index + 1) {
-        newConents = update(newConents, { $splice: [[index + 1, 0, getInitialObject()]] });
+        newConents = update(newConents, { $splice: [[index + 1, 0, getInitialObject(this.props.styleList)]] });
       }
 
       this.focusOnNextUpdate = index + 1;
