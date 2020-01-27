@@ -1,11 +1,21 @@
 import React, { Component } from 'react';
-import { View, Text, Image, Platform } from 'react-native';
+import { View, Text, Image, Platform, StyleSheet } from 'react-native';
 import _ from 'lodash';
 
 import { convertToObject } from './Convertors';
 import CNStyledText from './CNStyledText';
 
 const isAndroid = Platform.OS === 'android';
+const styles = StyleSheet.create({
+  imageWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contentWrapper: {
+    flexGrow: 1,
+  },
+});
 
 class CNRichTextView extends Component {
   renderText(contents, index) {
@@ -56,11 +66,7 @@ class CNRichTextView extends Component {
     return (
       <View
         key={`image${index}`}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        style={styles.imageWrapper}
       >
         <View>
           <ImageComponent
@@ -75,7 +81,7 @@ class CNRichTextView extends Component {
 
   render() {
     return (
-      <View style={this.props.style}>
+      <View style={[this.props.style, styles.contentWrapper]}>
         {
           _.map(this.props.value, (item, index) => {
             if (item.component === 'text') {
