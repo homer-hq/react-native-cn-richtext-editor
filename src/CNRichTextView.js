@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Platform } from 'react-native';
 import _ from 'lodash';
 
 import { convertToObject } from './Convertors';
 import CNStyledText from './CNStyledText';
+
+const isAndroid = Platform.OS === 'android';
 
 class CNRichTextView extends Component {
   renderText(contents, index) {
@@ -27,6 +29,11 @@ class CNRichTextView extends Component {
 
             if (item.stype.includes('bold') && item.stype.includes('italic') && styleList.boldItalic) {
               customStyles = { ...customStyles, ...styleList.boldItalic };
+            }
+
+            // fix for android
+            if (isAndroid && item.stype.includes('underline') && item.stype.includes('lineThrough')) {
+              customStyles = { ...customStyles, textDecorationLine: 'underline line-through' };
             }
 
             return (
