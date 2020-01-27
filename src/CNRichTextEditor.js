@@ -434,6 +434,7 @@ class CNRichTextEditor extends Component {
             textInputProps={this.props.textInputProps}
             style={this.props.textInputStyle}
             onKeyPressHandler={this.props.onKeyPressHandler}
+            onChangeTail={isLast ? this.props.onChangeTail : undefined}
           />
         </View>
       );

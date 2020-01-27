@@ -1347,15 +1347,26 @@ class CNTextInput extends Component {
             onContentSizeChange={this.handleContentSizeChange}
             placeholder={IS_IOS ? this.props.placeholder : undefined}
           >
-            {_.map(items, item => {
+            {_.map(items, (item, i, arr) => {
+              const isLast = i === arr.length - 1;
               let customStyles = item.stype.map(key => styleList[key] || null).filter(item => !!item);
 
               if (item.stype.includes('bold') && item.stype.includes('italic') && styleList.boldItalic) {
                 customStyles = { ...customStyles, ...styleList.boldItalic };
               }
 
+              // fix for android
+              if (!IS_IOS && item.stype.includes('underline') && item.stype.includes('lineThrough')) {
+                customStyles = { ...customStyles, textDecorationLine: 'underline line-through' };
+              }
+
               return(
-                <CNStyledText key={item.id} style={[androidFullFont, item.styleList, customStyles]} text={item.text} />
+                <CNStyledText
+                  key={item.id}
+                  style={[androidFullFont, item.styleList, customStyles]}
+                  text={item.text}
+                  onChangeTail={isLast ? this.props.onChangeTail : undefined}
+                />
               );
             })}
           </TextInput>
