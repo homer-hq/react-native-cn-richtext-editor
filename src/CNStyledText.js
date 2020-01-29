@@ -28,9 +28,21 @@ class CNStyledText extends Component {
 
   renderBaseText = (text = this.props.text, key = undefined) => {
     const isBullet = text === '\u2022' || text === '\n\u2022';
+    const crossplatformStyles = { ...StyleSheet.flatten(this.props.style) };
+
+    if (this.props.crossPlatformFonts) {
+      crossplatformStyles.fontFamily = _.get(
+        this.props.crossPlatformFonts,
+        `${crossplatformStyles.fontFamily}.font`,
+        crossplatformStyles.fontFamily
+      );
+    }
 
     return (
-      <Text style={[this.props.style, isBullet && styles.ul]} key={key}>
+      <Text
+        style={[crossplatformStyles, isBullet && styles.ul]}
+        key={key}
+      >
         {text}
       </Text>
     );

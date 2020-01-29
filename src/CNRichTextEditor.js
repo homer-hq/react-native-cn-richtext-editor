@@ -435,6 +435,7 @@ class CNRichTextEditor extends Component {
             style={this.props.textInputStyle}
             onKeyPressHandler={this.props.onKeyPressHandler}
             onChangeTail={isLast ? this.props.onChangeTail : undefined}
+            crossPlatformFonts={this.props.crossPlatformFonts}
           />
         </View>
       );
@@ -617,6 +618,7 @@ class CNRichTextEditor extends Component {
                         style={{
                           width: this.state.layoutWidth,
                         }}
+                        crossPlatformFonts={this.props.crossPlatformFonts}
                       />
                     </View>
                     )

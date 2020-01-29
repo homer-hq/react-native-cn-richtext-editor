@@ -51,6 +51,7 @@ class CNRichTextView extends Component {
                 key={item.id}
                 style={customStyles}
                 text={item.text}
+                crossPlatformFonts={this.props.crossPlatformFonts}
               />
             );
           })
