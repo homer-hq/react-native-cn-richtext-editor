@@ -13,37 +13,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentWrapper: {
+    flex: 1,
     flexGrow: 1,
   },
 });
 
 class CNRichTextView extends Component {
   renderText(contents, index) {
-    const { styleList } = this.props;
+    const { styleList, simplifyStyles } = this.props;
 
     return (
       <Text key={contents.id}>
         {
           _.map(contents.content, item => {
-            let customStyles = { ...item.styleList };
+            let customStyles =  simplifyStyles ? {} : { ...item.styleList };
 
             if (styleList[item.tag]) {
               customStyles = { ...customStyles, ...styleList[item.tag] };
             }
 
-            item.stype.forEach(key => {
-              if (styleList[key]) {
-                customStyles = { ...customStyles, ...styleList[key] };
+            if (!simplifyStyles) {
+              item.stype.forEach(key => {
+                if (styleList[key]) {
+                  customStyles = { ...customStyles, ...styleList[key] };
+                }
+              });
+
+              if (item.stype.includes('bold') && item.stype.includes('italic') && styleList.boldItalic) {
+                customStyles = { ...customStyles, ...styleList.boldItalic };
               }
-            });
 
-            if (item.stype.includes('bold') && item.stype.includes('italic') && styleList.boldItalic) {
-              customStyles = { ...customStyles, ...styleList.boldItalic };
-            }
-
-            // fix for android
-            if (isAndroid && item.stype.includes('underline') && item.stype.includes('lineThrough')) {
-              customStyles = { ...customStyles, textDecorationLine: 'underline line-through' };
+              // fix for android
+              if (isAndroid && item.stype.includes('underline') && item.stype.includes('lineThrough')) {
+                customStyles = { ...customStyles, textDecorationLine: 'underline line-through' };
+              }
             }
 
             return (
@@ -61,8 +64,9 @@ class CNRichTextView extends Component {
   }
 
   renderImage(image, index) {
-    const { ImageComponent = Image } = this.props;
-    const { width, height } = image.size;
+    const { ImageComponent = Image, imageScale = 1 } = this.props;
+    const width = image.size.width * imageScale;
+    const height = image.size.height * imageScale;
 
     return (
       <View
