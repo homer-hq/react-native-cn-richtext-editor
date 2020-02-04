@@ -181,7 +181,6 @@ class CNTextInput extends Component {
     }
 
     const { selection } = event.nativeEvent;
-
     if (this.decreaseNextSelection) {
       selection.start -= 1;
       selection.end -= 1;
@@ -1342,7 +1341,7 @@ class CNTextInput extends Component {
     const { items, onFocus } = this.props;
     const isEmptyInput = items.length === 1 && !items[0].text;
 
-    if (isEmptyInput) {
+    if (isEmptyInput && !IS_IOS) {
       this.useUpcomingMockStyles = this.getStylesByStype();
     }
 

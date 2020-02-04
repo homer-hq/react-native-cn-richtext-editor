@@ -237,11 +237,15 @@ class CNRichTextEditor extends Component {
             content: [],
           };
 
+          beforeContent.content = before;
+          /*
+           * old broken code
           if (before[before.length - 1].text === '\n' && before[before.length - 1].readOnly !== true) {
             beforeContent.content = update(before, { $splice: [[before.length - 1, 1]] });
           } else {
             beforeContent.content = before;
           }
+          */
 
           newConents = update(newConents, { [index - 1]: { $set: beforeContent } });
 
@@ -252,10 +256,13 @@ class CNRichTextEditor extends Component {
               content: [],
             };
 
+            /*
+             * old broken code
             if (after[0].text.startsWith('\n')) {
               after[0].text = after[0].text.substring(1);
               after[0].len = after[0].text.length;
             }
+            */
 
             afterContent.content = after;
 
