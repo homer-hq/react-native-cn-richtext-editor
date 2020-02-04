@@ -8,6 +8,7 @@ import CNStyledText from './CNStyledText';
 import shortid from 'shortid';
 
 const IS_IOS = Platform.OS === 'ios';
+const HIDDEN_SYMBOL = '\u2060';
 
 class CNTextInput extends Component {
   constructor(props) {
@@ -27,10 +28,11 @@ class CNTextInput extends Component {
 
     this.avoidAndroidIssueWhenPressSpaceText = '';
     this.justToolAdded = false;
+
+    this.useUpcomingMockStyles = null;
+    this.decreaseNextSelection = false;
     this.state = {
-      selectedTag: 'body',
       selection: { start: 0, end: 0 },
-      avoidUpdateText: false,
     };
 
     this.dmp = new DiffMatchPatch();
@@ -161,6 +163,9 @@ class CNTextInput extends Component {
     return newContent;
   }
 
+  /**
+   * getSelection
+   */
   getSelection = () => {
     if (this.shouldGetSelection) {
       this.shouldGetSelection = false;
@@ -171,7 +176,19 @@ class CNTextInput extends Component {
   };
 
   onSelectionChange = (event) => {
+    if (this.useUpcomingMockStyles) {
+      return;
+    }
+
     const { selection } = event.nativeEvent;
+
+    if (this.decreaseNextSelection) {
+      selection.start -= 1;
+      selection.end -= 1;
+      this.setState({ selection });
+      this.decreaseNextSelection = false;
+      return;
+    }
 
     if ((this.justToolAdded == true
           && selection.start == selection.end
@@ -256,7 +273,15 @@ class CNTextInput extends Component {
     this.avoidUpdateStyle = false;
   }
 
-  handleChangeText = (text) => {
+  handleChangeText = (rawText) => {
+    let text = rawText;
+    const indexOfUpcomingMockStyles = IS_IOS ? -1 : text.lastIndexOf(HIDDEN_SYMBOL);
+
+    if (indexOfUpcomingMockStyles > -1) {
+      text = text.split(HIDDEN_SYMBOL).join('');
+      this.decreaseNextSelection = true;
+    }
+
     let recalcText = false;
     const { selection } = this.state;
     const { items } = this.props;
@@ -438,7 +463,7 @@ class CNTextInput extends Component {
     this.upComingStype = upComing;
 
     this.props.onContentChanged(content);
-    if (this.props.onSelectedStyleChanged) {
+    if (this.props.onSelectedStyleChanged && !this.decreaseNextSelection) {
       this.props.onSelectedStyleChanged(styles);
     }
 
@@ -448,7 +473,6 @@ class CNTextInput extends Component {
 
     this.notifyMeasureContentChanged(content);
   }
-
 
   addTextToContent(content, cursorPosition, textToAdd) {
     let avoidStopSelectionForIOS = false;
@@ -796,6 +820,10 @@ class CNTextInput extends Component {
   }
 
   applyStyle(toolType) {
+    if (this.useUpcomingMockStyles) {
+      this.useUpcomingMockStyles = null;
+    }
+
     const { selection: { start, end } } = this.state;
     const { items } = this.props;
 
@@ -1019,18 +1047,28 @@ class CNTextInput extends Component {
       }
     }
 
-    const res = this.findContentIndex(newCollection, this.state.selection.end);
+    const { findIndx } = this.findContentIndex(newCollection, this.state.selection.end);
 
     let styles = [];
     if (this.upComingStype != null) {
       styles = this.upComingStype.stype;
     } else {
-      styles = newCollection[res.findIndx].stype;
+      styles = newCollection[findIndx].stype;
     }
 
     this.justToolAdded = start !== end;
     this.props.onContentChanged(newCollection);
-    if (this.props.onSelectedStyleChanged) this.props.onSelectedStyleChanged(styles);
+
+    if (this.props.onSelectedStyleChanged) {
+      this.props.onSelectedStyleChanged(styles);
+    }
+
+    const shouldUseUpcomingMockStyles = !IS_IOS && (findIndx === this.props.items.length - 1);
+
+    if (shouldUseUpcomingMockStyles) {
+      this.useUpcomingMockStyles = this.getStylesByStype(styles);
+      this.forceUpdateWitheCalculate();
+    }
   }
 
   reCalculateText = (content) => {
@@ -1301,32 +1339,62 @@ class CNTextInput extends Component {
   }
 
   onFocus = (e) => {
-    if (this.props.onFocus) this.props.onFocus(e);
+    const { items, onFocus } = this.props;
+    const isEmptyInput = items.length === 1 && !items[0].text;
+
+    if (isEmptyInput) {
+      this.useUpcomingMockStyles = this.getStylesByStype();
+    }
+
+    onFocus && onFocus(e);
   }
 
   onBlur = (e) => {
-    if (this.props.onBlur) this.props.onBlur(e);
+    const { items, onBlur } = this.props;
+    const isEmptyInput = items.length === 1 && !items[0].text;
+
+    if (isEmptyInput && this.useUpcomingMockStyles) {
+      this.useUpcomingMockStyles = null;
+      this.forceUpdateWitheCalculate();
+    }
+
+    onBlur && onBlur(e);
   }
 
   avoidSelectionChangeOnFocus() {
     this.avoidSelectionChangeOnFocus = true;
   }
 
+  /**
+   * handleKeyDown
+   */
   handleKeyDown = (e) => {
-    this.checkKeyPressAndroid += 1;
-    if (e.nativeEvent.key === 'Backspace' && this.state.selection.start === 0
-      && this.state.selection.end === 0) {
-      if (this.props.onConnectToPrevClicked) this.props.onConnectToPrevClicked();
+    if (this.useUpcomingMockStyles) {
+      this.useUpcomingMockStyles = null;
     }
 
-    if (typeof this.props.onKeyPressHandler === 'function') {
+    this.checkKeyPressAndroid += 1;
+    if (e.nativeEvent.key === 'Backspace'
+      && this.state.selection.start === 0
+      && this.state.selection.end === 0
+      && this.props.onConnectToPrevClicked
+    ) {
+      this.props.onConnectToPrevClicked();
+    }
+
+    if (this.props.onKeyPressHandler) {
       this.props.onKeyPressHandler(e);
     }
-  }
+  };
 
+  /**
+   * handleContentSizeChange
+   */
   handleContentSizeChange = (event) => {
-    if (this.props.onContentSizeChange) this.props.onContentSizeChange(event);
-  }
+    if (this.props.onContentSizeChange) {
+      this.props.onContentSizeChange(event);
+    }
+  };
 
   splitItems() {
     const { selection } = this.state;
@@ -1393,6 +1461,36 @@ class CNTextInput extends Component {
     }
   }
 
+  getStylesByStype = (stype = [], heritageStyles = {}) => {
+    const { styleList, crossPlatformFonts } = this.props;
+    let resultStyles = stype.map(key => styleList[key] || null).filter(item => !!item);
+
+    if (stype.includes('bold') && stype.includes('italic') && styleList.boldItalic) {
+      resultStyles = { ...styleList.boldItalic, ...StyleSheet.flatten(resultStyles) };
+    }
+
+    // fix for android
+    if (!IS_IOS && stype.includes('underline') && stype.includes('lineThrough')) {
+      resultStyles = { ...resultStyles, textDecorationLine: 'underline line-through' };
+    }
+    
+    resultStyles = {
+      ...StyleSheet.flatten(styleList.body),
+      ...StyleSheet.flatten(heritageStyles),
+      ...StyleSheet.flatten(resultStyles),
+    };
+
+    if (crossPlatformFonts) {
+      resultStyles.fontFamily = _.get(
+        crossPlatformFonts,
+        `${resultStyles.fontFamily}.font`,
+        resultStyles.fontFamily
+      );
+    }
+
+    return resultStyles;
+  };
+
   render() {
     const { items, style, returnKeyType, styleList, textInputProps } = this.props;
     const { selection } = this.state;
@@ -1402,7 +1500,7 @@ class CNTextInput extends Component {
       fontDefaultStyle.fontFamily = _.get(this.props.crossPlatformFonts, 'regular.font', fontDefaultStyle.fontFamily);
     }
     // fixes for android font family
-    const isEmptyInput = items.length ===1 && !items[0].text;
+    const isEmptyInput = items.length === 1 && !items[0].text;
     const androidEmptyFont = IS_IOS ? null : { fontFamily: undefined };
     const androidFullFont = IS_IOS ? null : { fontFamily: fontDefaultStyle.fontFamily };
 
@@ -1428,29 +1526,24 @@ class CNTextInput extends Component {
         >
           {_.map(items, (item, i, arr) => {
             const isLast = i === arr.length - 1;
-            let customStyles = item.stype.map(key => styleList[key] || null).filter(item => !!item);
-
-            if (item.stype.includes('bold') && item.stype.includes('italic') && styleList.boldItalic) {
-              customStyles = { ...customStyles, ...styleList.boldItalic };
-            }
-
-            // fix for android
-            if (!IS_IOS && item.stype.includes('underline') && item.stype.includes('lineThrough')) {
-              customStyles = { ...customStyles, textDecorationLine: 'underline line-through' };
-            }
+            const flatStyles = this.getStylesByStype(item.stype, item.styleList);
 
             return(
-              <CNStyledText
-                key={item.id}
-                style={[androidFullFont, item.styleList, customStyles]}
-                text={item.text}
-                onChangeTail={isLast ? this.props.onChangeTail : undefined}
-                crossPlatformFonts={this.props.crossPlatformFonts}
-              />
+              <React.Fragment>
+                <CNStyledText
+                  key={item.id}
+                  style={flatStyles}
+                  text={item.text}
+                  onChangeTail={isLast ? this.props.onChangeTail : undefined}
+                />
+                {!!this.useUpcomingMockStyles && isLast && (
+                  <Text style={this.useUpcomingMockStyles}>{HIDDEN_SYMBOL}</Text>
+                )}
+              </React.Fragment>
             );
           })}
         </TextInput>
-        {!IS_IOS && isEmptyInput && (
+        {!IS_IOS && isEmptyInput && !this.useUpcomingMockStyles && (
           <Text style={[
             fontDefaultStyle,
             style,
