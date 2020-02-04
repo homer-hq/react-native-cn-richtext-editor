@@ -35,6 +35,8 @@ class CNTextInput extends Component {
       selection: { start: 0, end: 0 },
     };
 
+    this.enterBtnCounter = 0;
+
     this.dmp = new DiffMatchPatch();
     this.oldText = '';
     this.reCalculateTextOnUpate = false;
@@ -279,6 +281,11 @@ class CNTextInput extends Component {
     if (indexOfUpcomingMockStyles > -1) {
       text = text.split(HIDDEN_SYMBOL).join('');
       this.decreaseNextSelection = true;
+    }
+
+    if (this.enterBtnCounter > 1) {
+      // this.decreaseNextSelection = true;
+      return;
     }
 
     let recalcText = false;
@@ -1370,6 +1377,11 @@ class CNTextInput extends Component {
   handleKeyDown = (e) => {
     if (this.useUpcomingMockStyles) {
       this.useUpcomingMockStyles = null;
+    }
+
+    if (e.nativeEvent.key === 'Enter' && !IS_IOS) {
+      this.enterBtnCounter += 1;
+      setTimeout(() => { this.enterBtnCounter = 0; }, 200);
     }
 
     this.checkKeyPressAndroid += 1;
