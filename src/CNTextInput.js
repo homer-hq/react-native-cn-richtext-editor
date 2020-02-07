@@ -1477,7 +1477,7 @@ class CNTextInput extends Component {
     let resultStyles = stype.map(key => styleList[key] || null).filter(item => !!item);
 
     if (stype.includes('bold') && stype.includes('italic') && styleList.boldItalic) {
-      resultStyles = { ...styleList.boldItalic, ...StyleSheet.flatten(resultStyles) };
+      resultStyles = { ...StyleSheet.flatten(resultStyles), ...styleList.boldItalic };
     }
 
     // fix for android
@@ -1533,7 +1533,7 @@ class CNTextInput extends Component {
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onContentSizeChange={this.handleContentSizeChange}
-          placeholder={IS_IOS ? this.props.placeholder : undefined}
+          placeholder={IS_IOS && isEmptyInput ? this.props.placeholder : undefined}
         >
           {_.map(items, (item, i, arr) => {
             const isLast = i === arr.length - 1;
