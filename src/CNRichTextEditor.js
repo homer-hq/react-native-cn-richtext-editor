@@ -1,20 +1,37 @@
 import React, { Component } from 'react';
 import {
-  TextInput, View, Image,
-  ScrollView, Platform,
+  TextInput,
+  View,
+  Image,
+  ScrollView,
+  Platform,
   TouchableWithoutFeedback,
 } from 'react-native';
 import _ from 'lodash';
 import update from 'immutability-helper';
+import shortid from 'shortid';
+
 import { getInitialObject, getDefaultStyles } from './Convertors';
 import CNTextInput from './CNTextInput';
-
-const shortid = require('shortid');
 
 const IS_IOS = Platform.OS === 'ios';
 
 class CNRichTextEditor extends Component {
-    state = {
+  constructor(props) {
+    super(props);
+    this.textInputs = [];
+    this.scrollview = null;
+    this.prevSelection = { start: 0, end: 0 };
+    this.beforePrevSelection = { start: 0, end: 0 };
+    this.avoidSelectionChangeOnFocus = false;
+    this.turnOnJustToolOnFocus = false;
+    this.contentHeights = [];
+    this.upComingStype = null;
+    this.focusOnNextUpdate = -1;
+    this.selectionOnFocus = null;
+    this.scrollOffset = 0;
+    this.defaultStyles = getDefaultStyles();
+    this.state = {
       imageHighLightedInex: -1,
       layoutWidth: 400,
       styles: [],
@@ -24,37 +41,22 @@ class CNRichTextEditor extends Component {
       focusInputIndex: 0,
       measureContent: [],
     };
+  }
 
-    constructor(props) {
-      super(props);
-      this.textInputs = [];
-      this.scrollview = null;
-      this.prevSelection = { start: 0, end: 0 };
-      this.beforePrevSelection = { start: 0, end: 0 };
-      this.avoidSelectionChangeOnFocus = false;
-      this.turnOnJustToolOnFocus = false;
-      this.contentHeights = [];
-      this.upComingStype = null;
+  componentDidUpdate(prevProps, prevState) {
+    if (this.focusOnNextUpdate != -1 && this.textInputs.length > this.focusOnNextUpdate) {
+      const ref = this.textInputs[this.focusOnNextUpdate];
+      ref && ref.focus(this.selectionOnFocus);
+      this.setState({focusInputIndex: this.focusOnNextUpdate});
       this.focusOnNextUpdate = -1;
       this.selectionOnFocus = null;
-      this.scrollOffset = 0;
-      this.defaultStyles = getDefaultStyles();
     }
+  }
 
-    componentDidUpdate(prevProps, prevState) {
-      if (this.focusOnNextUpdate != -1 && this.textInputs.length > this.focusOnNextUpdate) {
-        const ref = this.textInputs[this.focusOnNextUpdate];
-         if(ref) ref.focus(this.selectionOnFocus);
-        this.setState({focusInputIndex: this.focusOnNextUpdate});
-        this.focusOnNextUpdate = -1;
-        this.selectionOnFocus = null;
-      }
-    }
-
-    forceUpdateFocusedInput = () => {
-      this.textInputs[this.state.focusInputIndex]
-        && this.textInputs[this.state.focusInputIndex].forceUpdateWitheCalculate();
-    };
+  forceUpdateFocusedInput = () => {
+    this.textInputs[this.state.focusInputIndex]
+      && this.textInputs[this.state.focusInputIndex].forceUpdateWitheCalculate();
+  };
 
     findContentIndex(content, cursorPosition) {
       let indx = 0;

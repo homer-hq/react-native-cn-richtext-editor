@@ -1474,21 +1474,22 @@ class CNTextInput extends Component {
 
   getStylesByStype = (stype = [], heritageStyles = {}) => {
     const { styleList, crossPlatformFonts } = this.props;
-    let resultStyles = stype.map(key => styleList[key] || null).filter(item => !!item);
+    let resultStyles = {...StyleSheet.flatten(
+      stype.map(key => styleList[key] || null).filter(item => !!item)
+    )};
 
     if (stype.includes('bold') && stype.includes('italic') && styleList.boldItalic) {
-      resultStyles = { ...StyleSheet.flatten(resultStyles), ...styleList.boldItalic };
+      resultStyles = { ...resultStyles, ...styleList.boldItalic };
     }
 
-    // fix for android
-    if (!IS_IOS && stype.includes('underline') && stype.includes('lineThrough')) {
+    if (stype.includes('underline') && stype.includes('lineThrough')) {
       resultStyles = { ...resultStyles, textDecorationLine: 'underline line-through' };
     }
     
     resultStyles = {
       ...StyleSheet.flatten(styleList.body),
       ...StyleSheet.flatten(heritageStyles),
-      ...StyleSheet.flatten(resultStyles),
+      ...resultStyles,
     };
 
     if (crossPlatformFonts) {
@@ -1540,7 +1541,7 @@ class CNTextInput extends Component {
             const flatStyles = this.getStylesByStype(item.stype, item.styleList);
 
             return(
-              <React.Fragment>
+              <React.Fragment key={item.id}>
                 <CNStyledText
                   key={item.id}
                   style={flatStyles}
