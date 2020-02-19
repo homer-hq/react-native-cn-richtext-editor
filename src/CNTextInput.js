@@ -191,18 +191,18 @@ class CNTextInput extends Component {
       return;
     }
 
-    if ((this.justToolAdded == true
+    if (
+      (
+        this.justToolAdded == true
           && selection.start == selection.end
           && selection.end >= this.textLength
-    )
-          || (
-            selection.end == this.state.selection.end
-              && selection.start == this.state.selection.start
-          )
-          || (
-            this.justToolAdded == true
-              && this.checkKeyPressAndroid > 0
-          )
+      ) || (
+        selection.end == this.state.selection.end
+          && selection.start == this.state.selection.start
+      ) || (
+        this.justToolAdded == true
+          && this.checkKeyPressAndroid > 0
+      )
     ) {
       this.justToolAdded = false;
     } else {
@@ -260,7 +260,7 @@ class CNTextInput extends Component {
         });
       }
 
-      if (this.avoidUpdateStyle != true) {
+      if (this.avoidUpdateStyle !== true) {
         if (this.props.onSelectedStyleChanged) {
           this.props.onSelectedStyleChanged(styles);
         }
@@ -277,6 +277,7 @@ class CNTextInput extends Component {
   handleChangeText = (rawText) => {
     let text = rawText;
     const indexOfUpcomingMockStyles = IS_IOS ? -1 : text.lastIndexOf(HIDDEN_SYMBOL);
+    this.avoidUpdateStyle = true;
 
     if (indexOfUpcomingMockStyles > -1) {
       text = text.split(HIDDEN_SYMBOL).join('');
@@ -534,11 +535,12 @@ class CNTextInput extends Component {
       foundItemNo = itemNo;
 
       if (IS_IOS === true
-                  && avoidStopSelectionForIOS === false
-                  && !(foundIndex === content.length - 1
-                      && foundItemNo === content[foundIndex].len)
+          && avoidStopSelectionForIOS === false
+          && !(foundIndex === content.length - 1
+          && foundItemNo === content[foundIndex].len)
       ) {
-        this.justToolAdded = true;
+        // didn't find reason for it [19.02.20 by Vlad]
+        // this.justToolAdded = true;
       }
     }
 
