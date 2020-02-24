@@ -870,15 +870,19 @@ class CNTextInput extends Component {
     let indx = 0;
     let upComingAdded = false;
 
+    const currentContentIndex = this.findContentIndex(content, end);
+    currentStype = currentContentIndex ? content[currentContentIndex.findIndx].stype : [];
+    const isNewToolType = !currentStype.includes(toolType);
+
     for (let i = 0; i < content.length; i++) {
       const { id, len, stype, tag, text, styleList } = content[i];
       const NewLine = content[i].NewLine ? content[i].NewLine : false;
       const readOnly = content[i].readOnly ? content[i].readOnly : false;
 
       const indexOfToolType = stype.indexOf(toolType);
-      const newStype = (indexOfToolType != -1)
-        ? update(stype, { $splice: [[indexOfToolType, 1]] })
-        : update(stype, { $push: [toolType] });
+      const newStype = isNewToolType
+        ? ( (indexOfToolType !== -1) ? stype : update(stype, { $push: [toolType] }) )
+        : ( (indexOfToolType !== -1) ? update(stype, { $splice: [[indexOfToolType, 1]] }) : stype );
 
       const newStyles = StyleSheet.flatten(this.convertStyleList(update(newStype, { $push: [tag] })));
 
