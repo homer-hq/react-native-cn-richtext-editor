@@ -13,6 +13,8 @@ const HIDDEN_SYMBOL = '\u2060';
 class CNTextInput extends Component {
   constructor(props) {
     super(props);
+    this.DEBUGG_COMPONENT = props.debugMode || false;
+
     this.textInput = null;
     this.prevSelection = { start: 0, end: 0 };
     this.beforePrevSelection = { start: 0, end: 0 };
@@ -47,6 +49,8 @@ class CNTextInput extends Component {
   }
 
   componentWillMount() {
+    this.DEBUGG_COMPONENT && console.log('--- componentWillMount ---');
+
     const { items } = this.props;
     if(Array.isArray(items) === true) {
       let content = items;
@@ -63,6 +67,8 @@ class CNTextInput extends Component {
   }
 
   componentDidMount() {
+    this.DEBUGG_COMPONENT && console.log('--- componentDidMount ---');
+
     if (this.props.items) {
       this.textLength = 0;
       // for (let index = 0; index < this.props.items.length; index++) {
@@ -75,6 +81,8 @@ class CNTextInput extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    this.DEBUGG_COMPONENT && console.log('--- componentDidUpdate ---');
+
     if (this.reCalculateTextOnUpate === true) {
       this.oldText = this.reCalculateText(this.props.items);
       this.textLength = this.oldText.length;
@@ -83,11 +91,15 @@ class CNTextInput extends Component {
   }
 
   forceUpdateWitheCalculate = () => {
+    this.DEBUGG_COMPONENT && console.log('--- forceUpdateWitheCalculate ---');
+
     this.reCalculateTextOnUpate = true;
     this.forceUpdate();
   };
 
-  findContentIndex(content, cursorPosition) {
+  findContentIndex = (content, cursorPosition) => {
+    this.DEBUGG_COMPONENT && console.log('--- findContentIndex ---');
+
     let indx = 0;
     let findIndx = -1;
     let checknext = true;
@@ -121,9 +133,11 @@ class CNTextInput extends Component {
     }
 
     return { findIndx, itemNo };
-  }
+  };
 
-  updateContent(content, item, index, itemNo = 0) {
+  updateContent = (content, item, index, itemNo = 0) => {
+    this.DEBUGG_COMPONENT && console.log('--- updateContent ---');
+
     let newContent = content;
     if (index >= 0 && newContent[index].len === 0) {
       if (item !== null) {
@@ -163,12 +177,11 @@ class CNTextInput extends Component {
     }
 
     return newContent;
-  }
+  };
 
-  /**
-   * getSelection
-   */
   getSelection = () => {
+    this.DEBUGG_COMPONENT && console.log('--- getSelection ---');
+
     if (this.shouldGetSelection) {
       this.shouldGetSelection = false;
       return this.state.selection;
@@ -178,6 +191,8 @@ class CNTextInput extends Component {
   };
 
   onSelectionChange = (event) => {
+    this.DEBUGG_COMPONENT && console.log('--- onSelectionChange ---');
+
     if (this.useUpcomingMockStyles) {
       return;
     }
@@ -272,9 +287,11 @@ class CNTextInput extends Component {
       this.notifyMeasureContentChanged(this.props.items);
     }
     this.avoidUpdateStyle = false;
-  }
+  };
 
   handleChangeText = (rawText) => {
+    this.DEBUGG_COMPONENT && console.log('--- handleChangeText ---');
+
     let text = rawText;
     const indexOfUpcomingMockStyles = IS_IOS ? -1 : text.lastIndexOf(HIDDEN_SYMBOL);
     this.avoidUpdateStyle = true;
@@ -479,9 +496,11 @@ class CNTextInput extends Component {
     }
 
     this.notifyMeasureContentChanged(content);
-  }
+  };
 
-  addTextToContent(content, cursorPosition, textToAdd) {
+  addTextToContent = (content, cursorPosition, textToAdd) => {
+    this.DEBUGG_COMPONENT && console.log('--- addTextToContent ---');
+
     let avoidStopSelectionForIOS = false;
     let recalcText = false;
     const result = this.findContentIndex(content, cursorPosition);
@@ -566,9 +585,11 @@ class CNTextInput extends Component {
     }
 
     return { content, recalcText };
-  }
+  };
 
-  removeTextFromContent(content, cursorPosition, removeLength) {
+  removeTextFromContent = (content, cursorPosition, removeLength) => {
+    this.DEBUGG_COMPONENT && console.log('--- removeTextFromContent ---');
+
     let recalcText = false;
     let newLineIndexs = [];
     const removeIndexes = [];
@@ -720,9 +741,11 @@ class CNTextInput extends Component {
       upComing,
       recalcText,
     };
-  }
+  };
 
-  updateNewLine(content, index, itemNo) {
+  updateNewLine = (content, index, itemNo) => {
+    this.DEBUGG_COMPONENT && console.log('--- updateNewLine ---');
+
     let newContent = content;
     let recalcText = false;
     const prevTag = newContent[index].tag;
@@ -805,9 +828,11 @@ class CNTextInput extends Component {
     }
 
     return { content: newContent, recalcText };
-  }
+  };
 
-  createUpComing(start, end, tag, stype) {
+  createUpComing = (start, end, tag, stype) => {
+    this.DEBUGG_COMPONENT && console.log('--- createUpComing ---');
+
     this.upComingStype = {
       sel: { start, end },
       tag,
@@ -815,9 +840,11 @@ class CNTextInput extends Component {
       stype,
       styleList: StyleSheet.flatten(this.convertStyleList(update(stype, { $push: [tag] }))),
     };
-  }
+  };
 
-  addToUpComming(toolType) {
+  addToUpComming = (toolType) => {
+    this.DEBUGG_COMPONENT && console.log('--- addToUpComming ---');
+
     if (this.upComingStype) {
       const indexOfUpToolType = this.upComingStype.stype.indexOf(toolType);
       const newUpStype = this.upComingStype ? (indexOfUpToolType != -1 ? update(this.upComingStype.stype, { $splice: [[indexOfUpToolType, 1]] })
@@ -825,9 +852,11 @@ class CNTextInput extends Component {
       this.upComingStype.stype = newUpStype;
       this.upComingStype.styleList = StyleSheet.flatten(this.convertStyleList(update(newUpStype, { $push: [this.upComingStype.tag] })));
     }
-  }
+  };
 
-  applyStyle(toolType) {
+  applyStyle = (toolType) => {
+    this.DEBUGG_COMPONENT && console.log('--- applyStyle ---');
+
     if (this.useUpcomingMockStyles) {
       this.useUpcomingMockStyles = null;
     }
@@ -842,9 +871,7 @@ class CNTextInput extends Component {
     let upComingAdded = false;
 
     for (let i = 0; i < content.length; i++) {
-      const {
-        id, len, stype, tag, text, styleList,
-      } = content[i];
+      const { id, len, stype, tag, text, styleList } = content[i];
       const NewLine = content[i].NewLine ? content[i].NewLine : false;
       const readOnly = content[i].readOnly ? content[i].readOnly : false;
 
@@ -1077,17 +1104,21 @@ class CNTextInput extends Component {
       this.useUpcomingMockStyles = this.getStylesByStype(styles);
       this.forceUpdateWitheCalculate();
     }
-  }
+  };
 
   reCalculateText = (content) => {
+    this.DEBUGG_COMPONENT && console.log('--- reCalculateText ---');
+
     let text = '';
     for (let i = 0; i < content.length; i++) {
       text += content[i].text;
     }
     return text;
-  }
+  };
 
-  applyTag(tagType) {
+  applyTag = (tagType) => {
+    this.DEBUGG_COMPONENT && console.log('--- applyTag ---');
+
     const { items } = this.props;
     const { selection } = this.state;
 
@@ -1107,9 +1138,11 @@ class CNTextInput extends Component {
     }
 
     this.notifyMeasureContentChanged(content);
-  }
+  };
 
-  notifyMeasureContentChanged(content) {
+  notifyMeasureContentChanged = (content) => {
+    this.DEBUGG_COMPONENT && console.log('--- notifyMeasureContentChanged ---');
+
     if (this.props.onMeasureContentChanged) {
       try {
         setTimeout(() => {
@@ -1132,9 +1165,11 @@ class CNTextInput extends Component {
 
       }
     }
-  }
+  };
 
-  changeToTagIn(items, tag, index, fromTextChange = false) {
+  changeToTagIn = (items, tag, index, fromTextChange = false) => {
+    this.DEBUGG_COMPONENT && console.log('--- changeToTagIn ---');
+
     let recalcText = false;
     const needBold = tag === 'heading' || tag === 'title';
     let content = items;
@@ -1297,9 +1332,11 @@ class CNTextInput extends Component {
     }
 
     return { content, recalcText };
-  }
+  };
 
-  reorderList(items) {
+  reorderList = (items) => {
+    this.DEBUGG_COMPONENT && console.log('--- reorderList ---');
+
     let listNo = 1;
     for (let i = 0; i < items.length; i++) {
       const element = items[i];
@@ -1314,23 +1351,29 @@ class CNTextInput extends Component {
       }
     }
     return items;
-  }
+  };
 
-  convertStyleList(stylesArr) {
+  convertStyleList = (stylesArr) => {
+    this.DEBUGG_COMPONENT && console.log('--- convertStyleList ---');
+
     const styls = [];
     (stylesArr).forEach((element) => {
       const styleObj = this.txtToStyle(element);
       if (styleObj !== null) styls.push(styleObj);
     });
     return styls;
-  }
+  };
 
   txtToStyle = (styleName) => {
+    this.DEBUGG_COMPONENT && console.log('--- txtToStyle ---');
+
     const styles = this.props.styleList;
     return styles[styleName];
-  }
+  };
 
-  forceSelectedStyles() {
+  forceSelectedStyles = () => {
+    this.DEBUGG_COMPONENT && console.log('--- forceSelectedStyles ---');
+
     const content = this.props.items;
     const { selection } = this.state;
 
@@ -1344,9 +1387,11 @@ class CNTextInput extends Component {
     if (this.props.onSelectedTagChanged) {
       this.props.onSelectedTagChanged(selectedTag);
     }
-  }
+  };
 
   onFocus = (e) => {
+    this.DEBUGG_COMPONENT && console.log('--- onFocus ---');
+
     const { items, onFocus } = this.props;
     const isEmptyInput = items.length === 1 && !items[0].text;
 
@@ -1355,9 +1400,11 @@ class CNTextInput extends Component {
     }
 
     onFocus && onFocus(e);
-  }
+  };
 
   onBlur = (e) => {
+    this.DEBUGG_COMPONENT && console.log('--- onBlur ---');
+
     const { items, onBlur } = this.props;
     const isEmptyInput = items.length === 1 && !items[0].text;
 
@@ -1367,16 +1414,17 @@ class CNTextInput extends Component {
     }
 
     onBlur && onBlur(e);
-  }
+  };
 
-  avoidSelectionChangeOnFocus() {
+  avoidSelectionChangeOnFocus = () => {
+    this.DEBUGG_COMPONENT && console.log('--- avoidSelectionChangeOnFocus ---');
+
     this.avoidSelectionChangeOnFocus = true;
-  }
+  };
 
-  /**
-   * handleKeyDown
-   */
   handleKeyDown = (e) => {
+    this.DEBUGG_COMPONENT && console.log('--- handleKeyDown ---');
+
     if (this.useUpcomingMockStyles) {
       this.useUpcomingMockStyles = null;
     }
@@ -1400,16 +1448,17 @@ class CNTextInput extends Component {
     }
   };
 
-  /**
-   * handleContentSizeChange
-   */
   handleContentSizeChange = (event) => {
+    this.DEBUGG_COMPONENT && console.log('--- handleContentSizeChange ---');
+
     if (this.props.onContentSizeChange) {
       this.props.onContentSizeChange(event);
     }
   };
 
-  splitItems() {
+  splitItems = () => {
+    this.DEBUGG_COMPONENT && console.log('--- splitItems ---');
+
     const { selection } = this.state;
     const { items } = this.props;
     const content = items;
@@ -1460,9 +1509,11 @@ class CNTextInput extends Component {
       before: beforeContent,
       after: afterContent,
     };
-  }
+  };
 
-  focus(selection = null) {
+  focus = (selection = null) => {
+    this.DEBUGG_COMPONENT && console.log('--- focus ---');
+
     this.textInput.focus();
 
     if (selection != null && selection.start && selection.end) {
@@ -1472,9 +1523,11 @@ class CNTextInput extends Component {
         });
       }, 300);
     }
-  }
+  };
 
   getStylesByStype = (stype = [], heritageStyles = {}) => {
+    this.DEBUGG_COMPONENT && console.log('--- getStylesByStype ---');
+
     const { styleList, crossPlatformFonts } = this.props;
     let resultStyles = {...StyleSheet.flatten(
       stype.map(key => styleList[key] || null).filter(item => !!item)
@@ -1506,6 +1559,8 @@ class CNTextInput extends Component {
   };
 
   render() {
+    this.DEBUGG_COMPONENT && console.log('*** render CNTextInput ***');
+
     const { items, style, returnKeyType, styleList, textInputProps } = this.props;
     const { selection } = this.state;
 

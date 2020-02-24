@@ -399,7 +399,7 @@ class CNRichTextEditor extends Component {
     this.scrollOffset = Math.ceil(event.nativeEvent.contentOffset.y);
   };
 
-  renderInput = (input, index, isLast, measureScroll = true) => {
+  renderInput = (input, index, isLast, measureScroll = true, debugMode) => {
     const styles = this.props.styleList || this.defaultStyles;
 
     return (
@@ -426,6 +426,7 @@ class CNRichTextEditor extends Component {
           onKeyPressHandler={this.props.onKeyPressHandler}
           onChangeTail={isLast ? this.props.onChangeTail : undefined}
           crossPlatformFonts={this.props.crossPlatformFonts}
+          debugMode={debugMode}
         />
       </View>
     );
@@ -512,7 +513,7 @@ class CNRichTextEditor extends Component {
             {_.map(value, (item, index) => {
               if (item.component === 'text') {
                 return (
-                  this.renderInput(item, index, index === value.length - 1, measureInputScroll && IS_IOS)
+                  this.renderInput(item, index, index === value.length - 1, measureInputScroll && IS_IOS, false)
                 );
               }
 
