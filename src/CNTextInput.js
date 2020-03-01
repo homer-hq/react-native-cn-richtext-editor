@@ -30,6 +30,7 @@ class CNTextInput extends Component {
 
     this.avoidAndroidIssueWhenPressSpaceText = '';
     this.justToolAdded = false;
+    this.resetNextSelection = false;
 
     this.useUpcomingMockStyles = null;
     this.decreaseNextSelection = false;
@@ -198,28 +199,29 @@ class CNTextInput extends Component {
     }
 
     const { selection } = event.nativeEvent;
+
     if (this.decreaseNextSelection) {
       selection.start -= 1;
       selection.end -= 1;
       this.setState({ selection });
       this.decreaseNextSelection = false;
+
       return;
     }
 
-    if (
-      (
-        this.justToolAdded == true
-          && selection.start == selection.end
-          && selection.end >= this.textLength
-      ) || (
-        selection.end == this.state.selection.end
-          && selection.start == this.state.selection.start
-      ) || (
-        this.justToolAdded == true
-          && this.checkKeyPressAndroid > 0
-      )
+    if ((this.justToolAdded === true && selection.start === selection.end && selection.end >= this.textLength)
+      || (selection.end === this.state.selection.end && selection.start === this.state.selection.start)
+      || (this.justToolAdded === true && this.checkKeyPressAndroid > 0)
     ) {
       this.justToolAdded = false;
+
+      // workaround for bugs at applying styles for selected text (next input char breaks styles)
+      if (this.resetNextSelection) {
+        this.prevSelection = selection;
+        this.beforePrevSelection = selection;
+        this.setState({ selection });
+        this.resetNextSelection = false;
+      }
     } else {
       if (this.justToolAdded == true) {
         this.justToolAdded = false;
@@ -1096,6 +1098,10 @@ class CNTextInput extends Component {
     }
 
     this.justToolAdded = start !== end;
+    // not shure about reson of `justToolAdded`, so this one is for prevent wrong behaviour
+    // at applying styles at selected text
+    this.resetNextSelection = start !== end;
+
     this.props.onContentChanged(newCollection);
 
     if (this.props.onSelectedStyleChanged) {
