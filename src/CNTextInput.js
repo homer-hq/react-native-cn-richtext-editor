@@ -497,6 +497,12 @@ class CNTextInput extends Component {
       this.props.onSelectedTagChanged(tagg);
     }
 
+    if (this.props.forceUpdateParent) {
+      // replacement for `notifyMeasureContentChanged` which is not required
+      // but which evoke rendering of parent component and lead to correct work [02.03.20]
+      this.props.forceUpdateParent();
+    }
+
     this.notifyMeasureContentChanged(content);
   };
 

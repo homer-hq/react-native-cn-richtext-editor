@@ -427,6 +427,7 @@ class CNRichTextEditor extends Component {
           onChangeTail={isLast ? this.props.onChangeTail : undefined}
           crossPlatformFonts={this.props.crossPlatformFonts}
           debugMode={debugMode}
+          forceUpdateParent={() => this.forceUpdate()}
         />
       </View>
     );
