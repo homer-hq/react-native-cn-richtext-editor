@@ -1190,6 +1190,23 @@ class CNTextInput extends Component {
     const needBold = tag === 'heading' || tag === 'title';
     let content = items;
 
+    // emulate last empty 'ul' line as workaround for bullet list bug [03.03.20]
+    if (content[index].tag === 'ul' && tag === 'body' && content[index].text.length > 0) {
+      const newLine = {
+        id: shortid.generate(),
+        len: 2,
+        stype: [],
+        styleList: [],
+        tag: 'ul',
+        text: '\n\u2022',
+        NewLine: true,
+        readOnly: true,
+      };
+      content = update(content, { $splice: [[index + 1, 0, newLine]] });
+      this.textLength += 2;
+      index += 1;
+    }
+
     for (let i = index + 1; i < content.length; i++) {
       if (content[i].NewLine === true) {
         break;
@@ -1197,14 +1214,16 @@ class CNTextInput extends Component {
         if (needBold === true && content[i].stype.indexOf('bold') == -1) {
           content[i].stype = update(content[i].stype, { $push: ['bold'] });
         } else if (needBold === false
-                  && (content[i].tag === 'heading' || content[i].tag === 'title')
-                  && content[i].stype.indexOf('bold') != -1) {
+          && (content[i].tag === 'heading' || content[i].tag === 'title')
+          && content[i].stype.indexOf('bold') != -1
+        ) {
           content[i].stype = content[i].stype.filter(typ => typ != 'bold');
         }
         content[i].tag = tag;
         content[i].styleList = StyleSheet.flatten(this.convertStyleList(update(content[i].stype, { $push: [content[i].tag] })));
       }
     }
+
     let shouldReorderList = false;
 
     for (let i = index; i >= 0; i--) {
@@ -1213,12 +1232,14 @@ class CNTextInput extends Component {
       }
 
       if (needBold === true
-              // (content[i].tag === 'heading' || content[i].tag === 'title') &&
-              && content[i].stype.indexOf('bold') == -1) {
+        // (content[i].tag === 'heading' || content[i].tag === 'title') &&
+        && content[i].stype.indexOf('bold') == -1
+      ) {
         content[i].stype = update(content[i].stype, { $push: ['bold'] });
       } else if (needBold === false
-              && (content[i].tag === 'heading' || content[i].tag === 'title')
-              && content[i].stype.indexOf('bold') != -1) {
+        && (content[i].tag === 'heading' || content[i].tag === 'title')
+        && content[i].stype.indexOf('bold') != -1
+      ) {
         content[i].stype = content[i].stype.filter(typ => typ != 'bold');
       }
 
@@ -1260,6 +1281,15 @@ class CNTextInput extends Component {
                 readOnly: true,
               };
               content = update(content, { $splice: [[i, 0, listContent]] });
+            } else if (i > 1 && content[i - 1].tag === 'ul' && content[i - 1].text.includes('\u2022')) {
+              // experimental fix
+              content[i].tag = 'body';
+              content[i].text = '\n';
+              content[i].len = 1;
+              content[i].readOnly = false;
+              content[i].NewLine = true;
+              content[i].stype = [];
+              content[i].styleList = clearStyleList;
             } else {
               content[i].text = i === 0 ? '\u2022' : '\n\u2022';
               content[i].len = i === 0 ? 1 : 2;
@@ -1317,6 +1347,7 @@ class CNTextInput extends Component {
             }
           }
         } else if (content[i].readOnly === true) {
+          
           if (i !== 0) {
             this.textLength -= (content[i].len - 1);
             content[i].text = '\n';
@@ -1336,11 +1367,9 @@ class CNTextInput extends Component {
           }
         }
 
-
         break;
       }
     }
-
 
     if (shouldReorderList === true) {
       recalcText = true;
