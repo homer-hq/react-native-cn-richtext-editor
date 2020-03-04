@@ -145,6 +145,15 @@ class CNRichTextEditor extends Component {
     }
   };
 
+  blur = () => {
+    try {
+      const ref = this.textInputs[this.state.focusInputIndex];
+      ref && ref.blur();
+    } catch (error) {
+      // console.log(error);
+    }
+  };
+
   addImageContent = (url, id, height, width) => {
     const { focusInputIndex } = this.state;
     const { value } = this.props;

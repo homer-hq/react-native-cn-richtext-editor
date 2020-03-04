@@ -481,6 +481,8 @@ class CNTextInput extends Component {
       const res = this.findContentIndex(content, this.state.selection.end);
       styles = content[res.findIndx].stype;
       tagg = content[res.findIndx].tag;
+      // for android styles will update in `selectionChange` callback as it evokes lates [04.03.20]
+      this.avoidUpdateStyle = IS_IOS;
     } else {
       styles = upComing.stype;
       tagg = upComing.tag;
@@ -489,11 +491,11 @@ class CNTextInput extends Component {
     this.upComingStype = upComing;
 
     this.props.onContentChanged(content);
-    if (this.props.onSelectedStyleChanged && !this.decreaseNextSelection) {
+    if (this.props.onSelectedStyleChanged && !this.decreaseNextSelection && this.avoidUpdateStyle) {
       this.props.onSelectedStyleChanged(styles);
     }
 
-    if (this.props.onSelectedTagChanged) {
+    if (this.props.onSelectedTagChanged && this.avoidUpdateStyle) {
       this.props.onSelectedTagChanged(tagg);
     }
 
@@ -879,7 +881,7 @@ class CNTextInput extends Component {
     let upComingAdded = false;
 
     const currentContentIndex = this.findContentIndex(content, end);
-    currentStype = currentContentIndex ? content[currentContentIndex.findIndx].stype : [];
+    const currentStype = currentContentIndex ? content[currentContentIndex.findIndx].stype : [];
     const isNewToolType = !currentStype.includes(toolType);
 
     for (let i = 0; i < content.length; i++) {
@@ -1189,6 +1191,7 @@ class CNTextInput extends Component {
     let recalcText = false;
     const needBold = tag === 'heading' || tag === 'title';
     let content = items;
+    let skipFromTextChangeFix = false;
 
     // emulate last empty 'ul' line as workaround for bullet list bug [03.03.20]
     if (content[index].tag === 'ul' && tag === 'body' && content[index].text.length > 0) {
@@ -1283,6 +1286,7 @@ class CNTextInput extends Component {
               content = update(content, { $splice: [[i, 0, listContent]] });
             } else if (i > 1 && content[i - 1].tag === 'ul' && content[i - 1].text.includes('\u2022')) {
               // experimental fix
+              skipFromTextChangeFix = true;
               content[i].tag = 'body';
               content[i].text = '\n';
               content[i].len = 1;
@@ -1297,8 +1301,9 @@ class CNTextInput extends Component {
               content[i].stype = [];
               content[i].styleList = clearStyleList;
             }
+
             this.textLength += 1;
-            if (fromTextChange === true && IS_IOS !== true) {
+            if (fromTextChange === true && IS_IOS !== true && !skipFromTextChangeFix) {
               this.androidSelectionJump += 1;
             }
 
@@ -1568,6 +1573,11 @@ class CNTextInput extends Component {
         });
       }, 300);
     }
+  };
+
+  blur = () => {
+    this.DEBUGG_COMPONENT && console.log('--- blur ---');
+    this.textInput.blur();
   };
 
   getStylesByStype = (stype = [], heritageStyles = {}) => {
