@@ -40,7 +40,7 @@ export const CNToolbarIcon = (props) => {
         >
             <View style={[iconStyles,
                 {
-                    backgroundColor: backgroundColorCondition
+                    backgroundColor: 'transparent'
                 }]}
             >
                 {
