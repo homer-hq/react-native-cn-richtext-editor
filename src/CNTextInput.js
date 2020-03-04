@@ -1131,6 +1131,8 @@ class CNTextInput extends Component {
     for (let i = 0; i < content.length; i++) {
       text += content[i].text;
     }
+    this.androidSelectionJump = 0;
+
     return text;
   };
 
