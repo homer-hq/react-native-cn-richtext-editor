@@ -49,7 +49,7 @@ class CNTextInput extends Component {
     DiffMatchPatch.DIFF_EQUAL = 0;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.DEBUGG_COMPONENT && console.log('--- componentWillMount ---');
 
     const { items } = this.props;
