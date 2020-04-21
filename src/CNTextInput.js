@@ -253,8 +253,8 @@ class CNTextInput extends Component {
 
         const res = this.findContentIndex(content, selection.end);
 
-        styles = content[res.findIndx].stype;
-        selectedTag = content[res.findIndx].tag;
+        styles = _.get(content, `[${res.findIndx}].stype`, []);
+        selectedTag = _.get(content, `[${res.findIndx}].tag`, 'body');
       }
 
       if (this.avoidSelectionChangeOnFocus) {
