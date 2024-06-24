@@ -260,6 +260,8 @@ Also be noticed that this example is writen with expo and required 'react-native
 | onBlur    | Callback that is called when one of text inputs are blurred. | No |
 | placeholder    | The string that will be rendered before text input has been entered. | No |
 | textInputProps   | An object containing additional props to be passed to the TextInput component| No |
+| onTailChane | (FORKED) A callback that is called when tail of text of item was changed | No |
+| crossPlatformFonts | (FORKED) Map with fontFamily names for different fonts on ios and android | No |
 
 #### Instance methods
 
@@ -308,6 +310,9 @@ Also be noticed that this example is writen with expo and required 'react-native
 | text   | Yes | html string (created by convertToHtmlString function |
 | style | No | style applied to container (req. {flex:1}) |
 | styleList  |  No | an object consist of styles name and values (use getDefaultStyles function) |
+| crossPlatformFonts | (FORKED) Map with fontFamily names for different fonts on ios and android | No |
+| simplifyStyles | (FORKED) Use to render text without additional styles | No |
+| imageScale | (FORKED) Scale for origin image | No |
 
 ### Functions
 
