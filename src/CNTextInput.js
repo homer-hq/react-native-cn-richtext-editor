@@ -520,7 +520,7 @@ class CNTextInput extends Component {
 
     let startWithReadonly = false;
 
-    if (content[foundIndex].readOnly === true) {
+    if (content[foundIndex] && content[foundIndex].readOnly === true) {
       if (content[foundIndex].text.length === foundItemNo) {
         if (content.length > foundIndex + 1
                       && !(content[foundIndex + 1].readOnly === true)
